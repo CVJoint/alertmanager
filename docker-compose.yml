@@ -1,0 +1,99 @@
+version: "3.7"
+services:
+
+  prometheus-alertmanager:
+    user: root # https://github.com/prometheus/prometheus/issues/5976
+    hostname: prometheus-alertmanager
+    container_name: prometheus-alertmanager
+    image: prom/prometheus:v2.47.2
+    restart: always
+    networks: [charon-distributed-validator-node_dvnode]
+#    ports:
+#      - "9090:9090" # GUI + monitoring port
+    volumes:
+      - ./prometheus/data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/rules.yml:/rules.yml
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: "local"
+
+  node-exporter:
+    hostname: node-exporter
+    container_name: node-exporter
+    image: prom/node-exporter:latest
+    restart: always
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--web.listen-address=:9100'
+    networks: [charon-distributed-validator-node_dvnode]
+#    ports:
+#      - "127.0.0.1:9100:9100" # metrics port
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: "local"
+
+  alertmanager:
+    hostname: alertmanager
+    container_name: alertmanager
+    image: prom/alertmanager:latest
+    restart: always
+    command:
+      - '--config.file=/alertmanager.yml'
+    networks: [charon-distributed-validator-node_dvnode]
+#    ports:
+#      - "9093:9093" # prometheus connection port
+    volumes:
+      - ./alertmanager/alertmanager.yml:/alertmanager.yml
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: "local"
+
+  alertmanager-discord:
+    hostname: alertmanager-discord
+    container_name: alertmanager-discord
+    image: masgustavos/alertmanager-discord:latest
+    restart: always
+    networks: [charon-distributed-validator-node_dvnode]
+#    ports:
+#      - 8080:8080 # rpc / alertmanager connection port
+#      - 2345:2345 # not sure what this is for but was in project example
+    volumes:
+      - ./alertmanager-discord:/app
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      CONFIG_PATH: "/app/config.yaml"
+    logging:
+      driver: "local"
+
+  # Karma - GUI interface for alerts
+#  karma:
+#    hostname: karma
+#    container_name: karma
+#    image: ghcr.io/prymitive/karma:latest
+#    restart: always
+#    networks: [charon-distributed-validator-node_dvnode]
+#    ports:
+#      - "8080:8080" # GUI
+#    volumes:
+#      - /etc/timezone:/etc/timezone:ro
+#      - /etc/localtime:/etc/localtime:ro
+#    environment:
+#      - ALERTMANAGER_URI=http://alertmanager:9093
+#    logging:
+#      driver: "local"
+
+networks:
+  charon-distributed-validator-node_dvnode:
+    external: true

@@ -1,0 +1,91 @@
+---
+username: alertmanager
+# Set this URL to be able to click on the embed title and be redirected to
+# Prometheus with the query that generated the alert
+#prometheusURL: "http://localhost:9090"
+prometheusURL: "http://prometheus-alertmanager:9090"
+# Should be "status" or "severity". Defaults to "status".
+messageType: severity
+# How many firing alerts are necessary to add the "rolesToMention" in the message
+firingCountToMention: 20
+# Global config that defines which roles should be mentioned when the conditions
+# to "firingCountToMention" or "severitiesToMention" are met. Can be overridden
+# in channels config. To get the Role ID, just type the "@RoleName" in Discord
+# prefixed with "\" and send a message in the channel. Like "\@RoleName"
+#rolesToMention:
+#  - <@&744580819585969177>
+# Embed esthetics when the messageType is set to "status"
+status:
+  firing:
+    emoji: ":x:"
+#    emoji: ":exclamation:"
+    color: 10038562 #EmbedColorDarkRed
+  resolved:
+    emoji: ":white_check_mark:"
+    color: 3066993 # EmbedColorGreen
+# Setting the label key that represents the concept of "severity" and the
+# aesthetics for each of its values. The "priority" property determines
+# the order of the alerts in the message, where a higher priority means the
+# alert will be shown first.
+severity:
+  label: severity
+  values:
+    unknown:
+      color: 9807270 # EmbedColorGrey
+      emoji: ":grey_question:"
+    information:
+      color: 3447003 # EmbedColorBlue
+      emoji: ":information_source:"
+    warning:
+      color: 15844367 # EmbedColorGold
+      emoji: ":warning:"
+      priority: 1
+    critical:
+      color: 11027200 # EmbedColorDarkOrange
+      emoji: ":x:"
+      priority: 2
+    disaster:
+      color: 10038562 # EmbedColorDarkRed
+      emoji: ":fire:"
+      priority: 3
+# Which severities should enable mentioning in a message. Can be overriden
+# in channels config
+severitiesToMention:
+  - disaster
+  - critical
+# Which severities should not be sent as message if no other is present.
+# Useful to avoid sending only information alerts out of an incident context,
+# for example.
+severitiesToIgnoreWhenAlone:
+  - information
+# The Discord channels and their basic info, with any necessary overrides from
+# the global configs, such as "rolesToMention", "severitiesToMention" and
+# "severitiesToIgnoreWhenAlone"
+channels:
+  default:
+    name: default
+    webhookURL: $DISCORD_WEBHOOK_URL
+
+## Discord Colors:
+# EmbedColorAqua: 1752220
+# EmbedColorGreen: 3066993
+# EmbedColorBlue: 3447003
+# EmbedColorPurple: 10181046
+# EmbedColorGold: 15844367
+# EmbedColorOrange: 15105570
+# EmbedColorRed: 15158332
+# EmbedColorGrey: 9807270
+# EmbedColorDarkerGrey: 8359053
+# EmbedColorNavy: 3426654
+# EmbedColorDarkAqua: 1146986
+# EmbedColorDarkGreen: 2067276
+# EmbedColorDarkBlue: 2123412
+# EmbedColorDarkPurple: 7419530
+# EmbedColorDarkGold: 12745742
+# EmbedColorDarkOrange: 11027200
+# EmbedColorDarkRed: 10038562
+# EmbedColorDarkGrey: 9936031
+# EmbedColorLightGrey: 12370112
+# EmbedColorDarkNavy: 2899536
+# EmbedColorLuminousVividPink: 16580705
+# EmbedColorDarkVividPink: 12320855

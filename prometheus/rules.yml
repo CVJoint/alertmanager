@@ -1,0 +1,48 @@
+# Check rule syntax:
+#   docker exec -it prometheus-alertmanager promtool check rules /rules.yml
+groups:
+- name: AllInstances
+  rules:
+
+    ## Notify you if one of the prometheus scrape targets goes down
+     # To understand these targets, enable your prometheus port and go to prometheus dashboard <IP>:9090
+     # Search for the expression (expr), in the example below (ie: 'up' ) and you will see if they are up the expression == 1 and if down == 0
+  - alert: InstanceDown
+    # Condition for alerting
+    expr: up == 0
+    for: 1m
+    # Annotation - additional informational labels to store more information
+    annotations:
+      title: 'Instance {{ $labels.instance }} down'
+#      description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute.'
+      description: '{{ $labels.job }} has been down for more than 1 minute.'
+    # Labels - additional labels to be attached to the alert
+    labels:
+      severity: 'critical'
+
+  ## Haven't tested these yet
+  ## https://eth-educators.github.io/ethstaker-guides/alerting.html
+
+#  - alert: Available_disk_space_too_low
+#    expr: node_filesystem_avail_bytes{mountpoint="/"} <= 85899345920
+#    for: 1m
+#    labels:
+#      severity: critical
+#    annotations:
+#      summary: Available disk space below 80 GiB
+#
+#  - alert: Available_memory_too_low
+#    expr: node_memory_MemAvailable_bytes <= 1073741824
+#    for: 1m
+#    labels:
+#      severity: critical
+#    annotations:
+#      summary: Available memory below 1 GiB
+#
+#  - alert: CPU_usage_too_high
+#    expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) >= 90
+#    for: 5m
+#    labels:
+#      severity: critical
+#    annotations:
+#      summary: CPU usage above 90%
